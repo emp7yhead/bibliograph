@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  application:
+    build:
+      context: .
+    env_file: .env
+    volumes:
+      - .:/app:delegated
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+    command: uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload
+
+  database:
+    image: postgres:15.3-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: biblio
+    ports:
+      - 5432:5432
+    volumes:
+    - bibliograph-pgdata:/var/lib/postgresql/data
+
+  alembic:
+    build: .
+    env_file:
+      - .env
+    command: alembic upgrade head
+    depends_on:
+      - database
+
+volumes:
+  bibliograph-pgdata:

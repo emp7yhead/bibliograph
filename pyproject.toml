@@ -15,6 +15,11 @@ SQLAlchemy = "^2.0.16"
 uvicorn = "^0.22.0"
 python-dotenv = "^1.0.0"
 psycopg2-binary = "^2.9.6"
+pydantic = {extras = ["email"], version = "^1.10.9"}
+greenlet = "^2.0.2"
+python-jose = "^3.3.0"
+passlib = "^1.7.4"
+python-multipart = "^0.0.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.2"

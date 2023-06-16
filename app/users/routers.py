@@ -9,14 +9,7 @@ from app.auth.jwthandler import get_current_user
 from app.database import get_session
 from app.users.models import User
 from app.users.schemas import UserIn, UserOut
-from app.users.service import (
-    add_user,
-    get_all_users,
-    get_user,
-    get_user_by_username,
-    remove_user,
-    renew_user,
-)
+from app.users.service import get_all_users, get_user, remove_user, renew_user
 
 user_router = APIRouter(prefix='/users', tags=['Users'])
 
@@ -33,24 +26,6 @@ async def read_users(
 ) -> Sequence[User]:
     users: Sequence[User] = await get_all_users(session, limit, offset)
     return users
-
-
-@user_router.post(
-    '/',
-    response_model=UserOut,
-    status_code=HTTPStatus.CREATED,
-)
-async def create_user(
-    user: UserIn,
-    session: AsyncSession = Depends(get_session),
-) -> User:
-    db_user = await get_user_by_username(session, user.username)
-    if db_user:
-        raise HTTPException(
-            status_code=400, detail='Username already registered'
-        )
-    new_user: User = await add_user(session, user)
-    return new_user
 
 
 @user_router.get(

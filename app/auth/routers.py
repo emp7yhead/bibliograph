@@ -1,4 +1,5 @@
 from datetime import timedelta
+from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -10,21 +11,32 @@ from app.auth.jwthandler import create_access_token
 from app.auth.service import validate_user
 from app.database import get_session
 from app.settings import settings
+from app.users.models import User
 from app.users.schemas import UserIn, UserOut
-from app.users.service import add_user
+from app.users.service import add_user, get_user_by_username
 
 auth_router = APIRouter(tags=['Auth'])
 
 
-@auth_router.post("/register", response_model=UserOut)
+@auth_router.post(
+    '/register',
+    response_model=UserOut,
+    status_code=HTTPStatus.CREATED,
+)
 async def create_user(
     user: UserIn,
     session: AsyncSession = Depends(get_session)
 ) -> UserOut:
-    return await add_user(session, user)
+    db_user = await get_user_by_username(session, user.username)
+    if db_user:
+        raise HTTPException(
+            status_code=400, detail='Username already registered'
+        )
+    new_user: User = await add_user(session, user)
+    return new_user
 
 
-@auth_router.post("/login")
+@auth_router.post('/login')
 async def login(
     user: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_session)

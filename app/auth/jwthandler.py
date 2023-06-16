@@ -50,7 +50,7 @@ class OAuth2PasswordBearerCookie(OAuth2):
         return param
 
 
-security = OAuth2PasswordBearerCookie(token_url="/login")
+security = OAuth2PasswordBearerCookie(token_url="/login")  # noqa: S106
 
 
 def create_access_token(
@@ -83,7 +83,9 @@ async def get_current_user(
     )
 
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception

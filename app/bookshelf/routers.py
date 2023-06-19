@@ -2,12 +2,12 @@ from http import HTTPStatus
 from typing import Annotated, Sequence
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwthandler import get_current_user
 from app.bookshelf.models import Bookshelf
-from app.bookshelf.schemas import BookshelfIn, BookshelfOut, BookshelfOutDb
+from app.bookshelf.schemas import BookshelfIn, BookshelfOutDb
 from app.bookshelf.service import (
     add_bookshelf,
     get_bookshelf,

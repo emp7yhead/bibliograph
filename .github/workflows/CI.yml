@@ -1,0 +1,63 @@
+name: Run checks
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  test_and_lint:
+    runs-on: ubuntu-latest
+    env:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_SERVER: 0.0.0.0:5432
+      POSTGRES_DB: ''
+
+    defaults:
+      run:
+        working-directory: .
+
+    services:
+      db:
+        image: postgres:15.1-alpine
+        ports:
+          - '5432:5432'
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        python-version: [3.11]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Apply migrations
+        run: make migrate
+
+      - name: Run check
+        run: make check
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true

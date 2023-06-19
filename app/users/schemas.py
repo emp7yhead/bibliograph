@@ -1,15 +1,17 @@
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
+
+from app.bookshelf.schemas import UserBookshelf
 
 
 class UserBase(BaseModel):
     email: EmailStr
-    username: str
+    username: str = Field(max_length=50)
 
 
 class UserIn(UserBase):
-    password: str
+    password: str = Field(min_length=3, max_length=50)
 
 
 class UserOut(UserBase):
@@ -18,3 +20,7 @@ class UserOut(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class UserOutDb(UserOut):
+    bookshelves: list[UserBookshelf] | None

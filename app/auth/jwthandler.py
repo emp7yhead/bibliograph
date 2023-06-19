@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
@@ -18,8 +18,8 @@ class OAuth2PasswordBearerCookie(OAuth2):
     def __init__(
         self,
         token_url: str,
-        scheme_name: str = None,
-        scopes: dict = None,
+        scheme_name: str | None = None,
+        scopes: dict | None = None,
         auto_error: bool = True,
     ):
         if not scopes:
@@ -34,7 +34,7 @@ class OAuth2PasswordBearerCookie(OAuth2):
         )
 
     async def __call__(self, request: Request) -> Optional[str]:
-        authorization: str = request.cookies.get("Authorization")
+        authorization: str | None = request.cookies.get("Authorization")
         scheme, param = get_authorization_scheme_param(authorization)
 
         if not authorization or scheme.lower() != "bearer":
@@ -56,7 +56,16 @@ security = OAuth2PasswordBearerCookie(token_url="/login")  # noqa: S106
 def create_access_token(
     data: dict,
     expires_delta: Optional[timedelta] = None
-):
+) -> str:
+    """
+    Creates access token for user.
+
+    Args:
+        data: user data
+        expires_delta: expire time for token
+
+    Returns: token: str
+    """
     to_encode = data.copy()
 
     if expires_delta:
@@ -76,6 +85,15 @@ async def get_current_user(
     db_session: AsyncSession = Depends(get_session),
     token: str = Depends(security)
 ):
+    """
+    Get current user.
+
+    Args:
+        db_session: database async session
+        token: jwt token
+
+    Returns: User
+    """
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials",
@@ -83,17 +101,19 @@ async def get_current_user(
     )
 
     try:
-        payload = jwt.decode(
+        payload: dict[str, Any] = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
-        username: str = payload.get("sub")
+        username: str | None = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data: TokenData = TokenData(username=username)
     except JWTError:
         raise credentials_exception
 
-    user = await get_user_by_username(db_session, token_data.username)
+    user = await get_user_by_username(
+        db_session, token_data.username,  # type: ignore
+    )
     if not user:
         raise credentials_exception
 

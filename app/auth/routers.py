@@ -1,7 +1,7 @@
 from datetime import timedelta
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -22,6 +22,7 @@ auth_router = APIRouter(tags=['Auth'])
     '/register',
     response_model=UserOut,
     status_code=HTTPStatus.CREATED,
+    description='Create new user.',
 )
 async def create_user(
     user: UserIn,
@@ -36,16 +37,21 @@ async def create_user(
     return new_user
 
 
-@auth_router.post('/login')
+@auth_router.post(
+    '/login',
+    status_code=HTTPStatus.OK,
+    description='Verify user and gives access token.',
+)
 async def login(
     user: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_session)
 ):
+    """Login as user. Verify user and gives access token."""
     user = await validate_user(session, user)
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=HTTPStatus.UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )

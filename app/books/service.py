@@ -1,11 +1,12 @@
+from datetime import datetime
 from typing import Sequence
 
-from sqlalchemy import delete, insert, select
+from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.authors.service import get_author_id
-from app.books.models import Book
-from app.books.schemas import BookForDb
+from app.books.models import Book, ReadStatus
+from app.books.schemas import BookForDb, BookProgress
 from app.sentences.service import add_sentence
 
 
@@ -89,6 +90,63 @@ async def get_book_by_id(session: AsyncSession, book_id: int) -> Book | None:
         .where(Book.id == book_id)
     )
     return book.scalar_one_or_none()
+
+
+async def update_book(
+    session: AsyncSession, book_id: int, book_progress: BookProgress
+) -> Book:
+    """
+    Get book by id
+
+    Args:
+        session: database async session
+        book_id: id of book to update
+        books_progress: number of readed pages
+
+    Returns: Book | None
+    """
+    book: Book = await get_book_by_id(session, book_id)  # type: ignore
+    if not book_progress.readed_pages:
+        updated_book = await session.execute(
+            update(Book)
+            .where(Book.id == book_id)
+            .values(
+                status=ReadStatus.IN_PROGRESS,
+                started_at=datetime.now(),
+            )
+            .returning(Book)
+        )
+    elif book.readed_pages == book_progress.readed_pages:
+        updated_book = await session.execute(
+            update(Book)
+            .where(Book.id == book_id)
+            .values(
+                status=ReadStatus.FINISHED,
+                finished_at=datetime.now(),
+                readed_pages=book_progress.readed_pages,
+            )
+            .returning(Book)
+        )
+    elif book.progress == ReadStatus.IN_PROGRESS:
+        updated_book = await session.execute(
+            update(Book)
+            .where(Book.id == book_id)
+            .values(readed_pages=book_progress.readed_pages)
+            .returning(Book)
+        )
+    else:
+        updated_book = await session.execute(
+            update(Book)
+            .where(Book.id == book_id)
+            .values(
+                status=ReadStatus.IN_PROGRESS,
+                started_at=datetime.now(),
+                readed_pages=book_progress.readed_pages,
+            )
+            .returning(Book)
+        )
+    await session.commit()
+    return updated_book.scalar_one()
 
 
 async def remove_book(

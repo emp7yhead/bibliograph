@@ -2,7 +2,6 @@ from http import HTTPStatus
 from typing import Annotated, Sequence
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwthandler import get_current_user
@@ -101,12 +100,9 @@ async def update_bookshelf(
     if not db_bookshelf:
         raise HTTPException(status_code=404, detail='Booskhelf not found')
     if db_bookshelf.user_id == current_user.id:
-        try:
-            updated_bookshelf: Bookshelf = await renew_bookshelf(
-                session, bookshelf, bookshelf_id
-            )
-        except IntegrityError:
-            raise HTTPException(status_code=409, detail='Username alredy taken')
+        updated_bookshelf: Bookshelf = await renew_bookshelf(
+            session, bookshelf, bookshelf_id
+        )
         return updated_bookshelf
     raise HTTPException(status_code=403, detail="Not authorized to update")
 

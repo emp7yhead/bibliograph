@@ -38,7 +38,7 @@ async def read_users(
 
 @user_router.get(
     '/{user_id}',
-    response_model=UserOut,
+    response_model=UserOutDb,
     status_code=HTTPStatus.OK,
     description='Get user by id.',
 )

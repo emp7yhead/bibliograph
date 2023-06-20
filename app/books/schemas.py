@@ -38,7 +38,7 @@ class BookOutDb(BookOut):
     readed_pages: int
     started_at: datetime | None
     finished_at: datetime | None
-    progress: float
+    reading_progress: str
     time_to_read: str
 
 
@@ -54,3 +54,7 @@ class BookshelfBook(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class BookProgress(BaseModel):
+    readed_pages: int = 0

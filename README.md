@@ -6,7 +6,9 @@
 
 App for organizing book collection.
 
-[Deployed app on railway](bibliograph-production.up.railway.app)
+[Deployed app on railway](https://bibliograph-production.up.railway.app/)
+
+[API documentation can be found here](https://bibliograph-production.up.railway.app/docs)
 
 ## Functionality
 

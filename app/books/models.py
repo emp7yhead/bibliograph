@@ -26,14 +26,14 @@ class Book(Base):
     author_id: Mapped[int] = mapped_column(
         ForeignKey('authors.id')
     )
-    author: Mapped['Author'] = relationship(
+    author: Mapped['Author'] = relationship(  # noqa: F821
         back_populates='books',
         lazy='selectin',
     )
     title: Mapped[str]
     total_pages: Mapped[int]
     readed_pages: Mapped[int] = mapped_column(default=0)
-    first_sentence: Mapped['Sentence'] = relationship(
+    first_sentence: Mapped['Sentence'] = relationship(  # noqa: F821
         back_populates='books',
         lazy='selectin',
         cascade="all, delete, delete-orphan",

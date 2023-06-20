@@ -38,7 +38,7 @@ async def get_books(
         int | None,
         Query(description="Offset for list of books", ge=0)
     ] = None,
-) -> Book | None:
+) -> Sequence[Book]:
     """Get book info."""
     books: Sequence[Book] = await get_all_books(session, limit, offset)
     return books

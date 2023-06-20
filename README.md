@@ -6,12 +6,14 @@
 
 App for organizing book collection.
 
+[Deployed app on railway](bibliograph-production.up.railway.app)
+
 ## Functionality
 
-- create, read, update, delete users
-- authentification with JWT
-- create bookshelves for storing you book collection
-- and of course you can add books by title in your collection
+- Create, read, update, delete users
+- JWT Authentification
+- Create, read, update, delete bookshelves that stores you book collection
+- And of course you can add books by title in your collection, track number of readed pages in book
 
 ## Requirements
 

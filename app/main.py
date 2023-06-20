@@ -14,6 +14,11 @@ app = FastAPI(
 app.include_router(main_router)
 
 
+@app.get('/')
+def index() -> str:
+    return 'Welcome to Bibliograph. Please go to /docs for more information.'
+
+
 @app.get('/ping')
 def ping() -> str:
     return 'pong'

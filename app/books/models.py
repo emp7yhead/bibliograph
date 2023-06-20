@@ -36,7 +36,7 @@ class Book(Base):
     first_sentence: Mapped['Sentence'] = relationship(
         back_populates='books',
         lazy='selectin',
-        cascade="all, delete-orphan",
+        cascade="all, delete, delete-orphan",
     )
     status: Mapped[ReadStatus] = mapped_column(default=ReadStatus.ADDED)
     added_at: Mapped[datetime.datetime | None] = mapped_column(
@@ -49,29 +49,16 @@ class Book(Base):
         DateTime(timezone=True),
     )
 
+    @property
+    def progress(self):
+        """Calculate reading progress."""
+        return (self.total_pages / 100) * self.readed_pages
 
-class Author(Base):
-    __tablename__ = 'authors'
-
-    id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, index=True
-    )
-    books: Mapped[list[Book]] = relationship(
-        back_populates='author',
-        lazy='selectin',
-    )
-    name: Mapped[str]
-
-
-class Sentence(Base):
-    __tablename__ = 'sentences'
-
-    id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, index=True
-    )
-    book_id: Mapped[int] = mapped_column(ForeignKey('books.id'))
-    books: Mapped['Book'] = relationship(
-        back_populates='first_sentence',
-        lazy='selectin',
-    )
-    content: Mapped[str]
+    @property
+    def time_to_read(self):
+        """Calculate total time to read book."""
+        AVERAGE_PAGES_PER_HOUR = 50
+        raw_time = round(self.total_pages / AVERAGE_PAGES_PER_HOUR, 2)
+        hours: int = int(raw_time // 1)
+        minutes: float = int(raw_time % 1 * 60)
+        return f'{hours} hours {minutes} minutes'

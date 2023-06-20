@@ -2,7 +2,6 @@ from typing import Sequence
 
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.bookshelf.models import Bookshelf
 from app.bookshelf.schemas import BookshelfIn
@@ -21,7 +20,8 @@ async def get_bookshelves(
     Returns: Sequence[Bookshelf]
     """
     bookshelves = await session.execute(
-        select(Bookshelf).where(Bookshelf.user_id == user_id)
+        select(Bookshelf)
+        .where(Bookshelf.user_id == user_id)
     )
     return bookshelves.scalars().all()
 
@@ -40,7 +40,6 @@ async def get_bookshelf(
     """
     bookshelves = await session.execute(
         select(Bookshelf)
-        .options(selectinload(Bookshelf.books))
         .where(Bookshelf.id == bookshelf_id)
     )
     return bookshelves.scalar_one_or_none()
@@ -82,9 +81,13 @@ async def renew_bookshelf(
     Returns: Bookshelf
     """
     updated_bookshelf = await session.execute(
-        update(Bookshelf).where(Bookshelf.id == bookshelf_id).values(
+        update(Bookshelf)
+        .where(Bookshelf.id == bookshelf_id)
+        .values(
             title=bookshelf.title,
-        ).execution_options(synchronize_session="evaluate").returning(Bookshelf)
+        )
+        .execution_options(synchronize_session="evaluate")
+        .returning(Bookshelf)
     )
     await session.commit()
     return updated_bookshelf.scalar_one()
@@ -103,9 +106,10 @@ async def remove_bookshelf(
     Returns: Bookshelf
     """
     bookshelf = await session.execute(
-        delete(Bookshelf).
-        where(Bookshelf.id == bookshelf_id).
-        execution_options(synchronize_session="fetch").returning(Bookshelf)
+        delete(Bookshelf)
+        .where(Bookshelf.id == bookshelf_id)
+        .execution_options(synchronize_session="fetch")
+        .returning(Bookshelf)
     )
     await session.commit()
     return bookshelf.scalar_one_or_none()

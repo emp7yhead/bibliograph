@@ -1,9 +1,33 @@
-from sqlalchemy import insert, select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from typing import Sequence
 
-from app.books.models import Author, Book, Sentence
+from sqlalchemy import delete, insert, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.authors.service import get_author_id
+from app.books.models import Book
 from app.books.schemas import BookForDb
+from app.sentences.service import add_sentence
+
+
+async def get_all_books(
+    session: AsyncSession, offset: int | None, limit: int | None
+) -> Sequence[Book]:
+    """
+    Get all books from database
+
+    Args:
+        session: database async session
+        offset: offset for query
+        limit: limit for query
+
+    Returns: Sequence[Book]
+    """
+    books = await session.execute(
+        select(Book)
+        .limit(limit)
+        .offset(offset)
+    )
+    return books.scalars().all()
 
 
 async def add_book_info(
@@ -19,7 +43,7 @@ async def add_book_info(
     Returns: Book
     """
     # Note: Add first search already existed book
-    author_id = await add_author(session, book_info)
+    author_id = await get_author_id(session, book_info)
     new_book = await add_book(session, book_info, bookshelf_id, author_id)
     if book_info.first_sentence:
         await add_sentence(
@@ -28,26 +52,6 @@ async def add_book_info(
     await session.flush()
     await session.commit()
     return new_book
-
-
-async def add_author(session: AsyncSession, book_info: BookForDb):
-    # NOTE: before add need to try find author
-    author_id = await session.execute(
-        insert(Author)
-        .values(name=''.join(book_info.author))
-        .returning(Author.id)
-    )
-    return author_id.scalar_one()
-
-
-async def add_sentence(session: AsyncSession, book_id: int, sentence: list):
-    return await session.execute(
-            insert(Sentence)
-            .values(
-                book_id=book_id,
-                content=''.join(sentence))
-            .returning(Sentence.id)
-        )
 
 
 async def add_book(
@@ -82,7 +86,28 @@ async def get_book_by_id(session: AsyncSession, book_id: int) -> Book | None:
     """
     book = await session.execute(
         select(Book)
-        .options(selectinload(Book.author))
         .where(Book.id == book_id)
     )
     return book.scalar_one_or_none()
+
+
+async def remove_book(
+    session: AsyncSession, book_id: int
+) -> Book | None:
+    """
+    Remove book from database
+
+    Args:
+        session: database async session
+        book_id: book id
+
+    Returns: Book
+    """
+    bookshelf = await session.execute(
+        delete(Book)
+        .where(Book.id == book_id)
+        .execution_options(synchronize_session="fetch")
+        .returning(Book)
+    )
+    await session.commit()
+    return bookshelf.scalar_one_or_none()

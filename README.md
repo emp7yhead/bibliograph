@@ -2,7 +2,8 @@
 
 [![codecov](https://codecov.io/gh/emp7yhead/bibliograph/branch/main/graph/badge.svg?token=uV2RgGcNwq)](https://codecov.io/gh/emp7yhead/bibliograph)
 [![Maintainability](https://api.codeclimate.com/v1/badges/c77cfa99ba81ed1d3c33/maintainability)](https://codeclimate.com/github/emp7yhead/bibliograph/maintainability)
-[![Run checks](https://github.com/emp7yhead/bibliograph/actions/workflows/CI.yml/badge.svg)](https://github.com/emp7yhead/bibliograph/actions/workflows/CI.yml)
+[![Check and Build](https://github.com/emp7yhead/bibliograph/actions/workflows/CI.yml/badge.svg)](https://github.com/emp7yhead/bibliograph/actions/workflows/CI.yml)
+![Docker Image Size (tag)](https://img.shields.io/docker/image-size/emptyhead/bibliograph/47122f2)
 
 App for organizing book collection.
 
@@ -56,3 +57,27 @@ App for organizing book collection.
     ```
 
 - Go to 0.0.0.0:5000
+
+### Docker
+
+You always can use docker image for:
+
+- installation
+
+  ```bash
+  docker pull emptyhead/bibliograph --platform linux/x86_64
+  ```
+
+- applying migration
+
+  ```bash
+  docker run -ti -p 5000:5000 emptyhead/bibliograph make migrate
+  ```
+
+- run app
+
+  ```bash
+  docker run -ti -p 5000:5000 emptyhead/bibliograph
+  ```
+
+But don't forget about environment variables when using docker.

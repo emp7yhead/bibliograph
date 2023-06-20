@@ -2,21 +2,9 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
+from app.authors.schemas import Author
 from app.books.models import ReadStatus
-
-
-class Author(BaseModel):
-    name: str
-
-    class Config:
-        orm_mode = True
-
-
-class Sentence(BaseModel):
-    content: str
-
-    class Config:
-        orm_mode = True
+from app.sentences.schemas import Sentence
 
 
 class BookIn(BaseModel):
@@ -28,7 +16,7 @@ class BookForDb(BaseModel):
     title: str
     total_pages: int = Field(alias='number_of_pages_median')
     author: list = Field(alias='author_name')
-    first_sentence: list
+    first_sentence: list | None
 
     class Config:
         extra = 'ignore'
@@ -36,7 +24,7 @@ class BookForDb(BaseModel):
 
 class BookOut(BookIn):
     id: int
-    total_pages: str
+    total_pages: int
     author: list[Author] | Author
     first_sentence: Sentence | None
     status: ReadStatus
@@ -50,6 +38,8 @@ class BookOutDb(BookOut):
     readed_pages: int
     started_at: datetime | None
     finished_at: datetime | None
+    progress: float
+    time_to_read: str
 
 
 class BookshelfBook(BaseModel):

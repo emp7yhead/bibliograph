@@ -1,6 +1,7 @@
 from typing import Any
 
 import aiohttp
+from fastapi import HTTPException
 
 from app.books.schemas import BookForDb
 
@@ -25,11 +26,16 @@ async def get_raw_info(book_title: str) -> dict[str, Any]:
 
     Returns: dict[str, Any]
     """
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            f'https://openlibrary.org/search.json?q={book_title}&fields=number_of_pages_median,author_name,first_sentence,title&limit=1'  # noqa: E501
-        ) as response:
+    params = {
+        'q': book_title,
+        'fields': 'number_of_pages_median,author_name,first_sentence,title',
+        'limit': 1,
+    }
+    async with aiohttp.ClientSession('https://openlibrary.org') as session:
+        async with session.get('/search.json', params=params) as response:
             raw_info = await response.json()
+    if not raw_info['docs']:
+        raise HTTPException(404, 'Book not found')
     return raw_info['docs'][0]
 
 

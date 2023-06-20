@@ -6,7 +6,7 @@ from pydantic import BaseSettings, PostgresDsn, validator
 class Settings(BaseSettings):
     app_name: str = 'bibliograph'
     description: str = 'App for organizing book collections'
-    version: str = "0.0.1"
+    version: str = "0.5.0"
     contact: dict = {
         'name': 'Artyom Kropp',
         'email': 'artyomkropp@gmail.com',

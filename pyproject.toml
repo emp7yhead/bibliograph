@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bibliograph"
-version = "0.1.0"
+version = "0.5.0"
 description = "App for organizing book collections"
 authors = ["emp7yhead <artyomkropp@gmail.com>"]
 readme = "README.md"
@@ -20,11 +20,11 @@ greenlet = "^2.0.2"
 python-jose = "^3.3.0"
 passlib = "^1.7.4"
 python-multipart = "^0.0.6"
+
+[tool.poetry.group.dev.dependencies]
 bcrypt = "^4.0.1"
 anyio = {extras = ["trio"], version = "^3.7.0"}
 pytest-asyncio = "^0.21.0"
-
-[tool.poetry.group.dev.dependencies]
 pytest = "^7.3.2"
 mypy = "^1.3.0"
 flake8 = "^6.0.0"

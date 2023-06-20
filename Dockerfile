@@ -1,6 +1,6 @@
-FROM python:3.11-alpine AS builder
+FROM python:3.11.3-alpine3.17
 
-WORKDIR /code
+WORKDIR /app
 
 RUN apk add --no-cache gcc \
     musl-dev \
@@ -8,27 +8,13 @@ RUN apk add --no-cache gcc \
     libffi-dev \
     openssl-dev
 
-ADD pyproject.toml poetry.lock /code/
+RUN pip install --no-cache-dir poetry
 
-RUN pip install poetry
+COPY pyproject.toml poetry.lock ./
 
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+RUN poetry config virtualenvs.create false && \
+    poetry install --only main --no-interaction --no-ansi --no-root
 
+COPY . .
 
-# ---
-
-FROM python:3.11-alpine
-
-WORKDIR /app
-
-COPY --from=builder /code/requirements.txt /app/requirements.txt
-
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
-
-RUN adduser -D user && chown -R user:user ./
-
-USER user
-
-COPY --chown=user:user ./ ./
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload"]
+CMD ["make", "serve"]

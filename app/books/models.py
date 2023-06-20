@@ -9,7 +9,6 @@ from app.database import Base
 
 class ReadStatus(enum.Enum):
     ADDED = 'added'
-    STARTED = 'started'
     IN_PROGRESS = 'in progress'
     FINISHED = 'finished'
 
@@ -50,9 +49,10 @@ class Book(Base):
     )
 
     @property
-    def progress(self):
+    def reading_progress(self):
         """Calculate reading progress."""
-        return (self.total_pages / 100) * self.readed_pages
+        percentage = round(self.readed_pages / (self.total_pages / 100), 2)
+        return f'{percentage}%'
 
     @property
     def time_to_read(self):

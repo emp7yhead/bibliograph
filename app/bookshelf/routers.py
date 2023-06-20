@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwthandler import get_current_user
 from app.bookshelf.models import Bookshelf
-from app.bookshelf.schemas import BookshelfIn, BookshelfOutDb
+from app.bookshelf.schemas import BookshelfIn, BookshelfOut, BookshelfOutDb
 from app.bookshelf.service import (
     add_bookshelf,
     get_bookshelf,
@@ -64,7 +64,7 @@ async def read_bookshelf(
 
 @bookshelf_router.post(
     '',
-    response_model=BookshelfOutDb,
+    response_model=BookshelfOut,
     status_code=HTTPStatus.CREATED,
     description='Create new bookshelf for user. User must be authenticated.',
 )
@@ -113,23 +113,23 @@ async def update_bookshelf(
 
 @bookshelf_router.delete(
     '/{bookshelf_id}',
-    response_model=BookshelfOutDb,
-    status_code=HTTPStatus.OK,
+    status_code=HTTPStatus.NO_CONTENT,
     response_description='Successfully deleted bookshelf',
     description='Delete user bookshelf by id. User must be authenticated.',
 )
 async def delete_bookshelf(
     bookshelf_id: Annotated[
         int,
-        Path(..., description="Get bookshelf data by id", gt=0)
+        Path(..., description="Delete bookshelf data by id", gt=0)
     ],
     current_user: Annotated[UserOut, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
-) -> Bookshelf | None:
+):
     """Removes bookshelf from user."""
     bookshelf: Bookshelf | None = await get_bookshelf(session, bookshelf_id)
     if not bookshelf:
-        raise HTTPException(status_code=404, detail="Bookshelf not found")
+        return HTTPStatus.NO_CONTENT
     if bookshelf.user_id == current_user.id:
-        return await remove_bookshelf(session, bookshelf_id)
+        await remove_bookshelf(session, bookshelf_id)
+        return HTTPStatus.NO_CONTENT
     raise HTTPException(status_code=403, detail="Not authorized to delete")

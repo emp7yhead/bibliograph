@@ -87,8 +87,7 @@ async def update_user(
 
 @user_router.delete(
     '/{user_id}',
-    response_model=UserOutDb,
-    status_code=HTTPStatus.OK,
+    status_code=HTTPStatus.NO_CONTENT,
     response_description='Successfully deleted user',
     description='Delete user by id. User must be authenticated.',
 )
@@ -99,11 +98,12 @@ async def delete_user(
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
     current_user: Annotated[UserOut, Depends(get_current_user)],
-) -> User | None:
+):
     """Remove user from database by specified id."""
     db_user: User | None = await get_user(session, user_id)
     if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
+        return HTTPStatus.NO_CONTENT
     if user_id == current_user.id:
-        return await remove_user(session, user_id)
+        await remove_user(session, user_id)
+        return HTTPStatus.NO_CONTENT
     raise HTTPException(status_code=403, detail="Not authorized to delete")

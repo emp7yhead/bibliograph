@@ -11,8 +11,8 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
-      POSTGRES_SERVER: 0.0.0.0:5432
-      POSTGRES_DB: ''
+      POSTGRES_SERVER: localhost:5432
+      POSTGRES_DB: test
 
     defaults:
       run:
@@ -26,6 +26,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
+          POSTGRES_DB: test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s

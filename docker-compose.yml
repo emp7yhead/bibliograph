@@ -4,7 +4,7 @@ services:
   application:
     build:
       context: .
-      dockerfile: dockerfile.dev
+      dockerfile: Dockerfile.dev
     env_file: .env
     volumes:
       - .:/app:delegated

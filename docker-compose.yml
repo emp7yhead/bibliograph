@@ -1,11 +1,25 @@
 version: '3.7'
 
 services:
-  application:
+
+  frontend:
     build:
       context: .
-      dockerfile: Dockerfile.dev
-    env_file: .env
+      dockerfile: ./docker/frontend/Dockerfile
+    env_file: ./.env
+    volumes:
+      - .:/src:delegated
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    command: yarn run dev
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    env_file: ./.env
     volumes:
       - .:/app:delegated
     ports:
@@ -26,7 +40,9 @@ services:
     - bibliograph-pgdata:/var/lib/postgresql/data
 
   alembic:
-    build: .
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
     env_file:
       - .env
     command: alembic upgrade head

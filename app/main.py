@@ -15,6 +15,7 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",
     "localhost:3000"
+    "frontend"
 ]
 
 
@@ -27,7 +28,7 @@ app.add_middleware(
 )
 
 
-app.include_router(main_router)
+app.include_router(main_router, prefix='/api/v1')
 
 
 @app.get('/')

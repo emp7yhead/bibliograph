@@ -1,73 +1,22 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Input } from '@nextui-org/react';
-import config from '../../config';
-import BibliographClient from '../../src/client';
+import React from 'react';
+import SignupForm from './Signup';
+import RegisterPic from './Picture';
 
-const client = new BibliographClient(config);
-
-function Registration() {
-  const [error, setError] = useState(false);
-  const [registerForm, setRegisterForm] = useState({ username: '', email: '', password: '' });
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const onRegister = (e) => {
-    // e.preventDefault();
-    setLoading(true);
-    setError(false);
-
-    client.register(registerForm.username, registerForm.email, registerForm.password)
-      .then(() => {
-        navigate('login');
-      })
-      .catch((err) => {
-        setLoading(false);
-        setError(true);
-        alert(err);
-      });
-  };
-
+export default function Registration() {
   return (
-    <form className="flex flex-col gap-4">
-      <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-        <Input
-          isRequired
-          key="username"
-          type="username"
-          label="Username"
-          labelPlacement="inside"
-          placeholder="Enter your username"
-          onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
-        />
-        <Input
-          isRequired
-          key="email"
-          type="email"
-          label="Email"
-          labelPlacement="inside"
-          placeholder="Enter your email"
-          onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
-        />
-        <Input
-          isRequired
-          key="password"
-          type="password"
-          label="Password"
-          labelPlacement="inside"
-          placeholder="Enter your password"
-          onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-        />
+    <>
+      <RegisterPic />
+      <div className="flex items-center w-full max-w-md px-6 mx-auto lg:w-2/6">
+        <div className="flex-1">
+          <div className="text-center">
+            <h2 className="text-6xl font-bold text-center text-gray-700 dark:text-white">bibliograph</h2>
+            <p className="mt-3 text-gray-500 dark:text-gray-300">Sign in to access your account</p>
+          </div>
+          <div className="mt-8">
+            <SignupForm />
+          </div>
+        </div>
       </div>
-      <Button
-        onPress={(e) => onRegister(e)}
-        color="primary"
-        isLoading={loading}
-      >
-        Create Account
-      </Button>
-    </form>
+    </>
   );
 }
-
-export default Registration;

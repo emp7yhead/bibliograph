@@ -1,37 +1,37 @@
 import React from 'react';
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button, Divider } from '@nextui-org/react';
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from '@nextui-org/react';
 
 export default function AppNavbar() {
   return (
-    <Navbar>
+    <Navbar isBordered shouldHideOnScroll>
       <NavbarBrand>
-        <p className="font-bold text-inherit">BIBLIOgraph</p>
+        <p className="font-bold text-inherit">bibliograph</p>
       </NavbarBrand>
       <NavbarContent className="sm:flex gap-4" justify="center">
         <NavbarItem>
-          <Link color="black" href="#">
+          <Button as={Link} radius="full" color="primary" href="#" variant="bordered">
             Books
-          </Link>
+          </Button>
         </NavbarItem>
-        <Divider orientation="vertical" />
         <NavbarItem isActive>
-          <Link href="#" color="black" aria-current="page">
+          <Button as={Link} radius="full" color="primary" href="#" variant="bordered">
             Bookshelves
-          </Link>
+          </Button>
         </NavbarItem>
-        <Divider orientation="vertical" />
         <NavbarItem>
-          <Link color="black" href="#">
+          <Button as={Link} radius="full" color="primary" href="#" variant="bordered">
             Statistic
-          </Link>
+          </Button>
         </NavbarItem>
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem className="lg:flex">
-          <Link href="#">Login</Link>
+          <Button as={Link} radius="full" color="primary" href="#" variant="bordered">
+            Log in
+          </Button>
         </NavbarItem>
         <NavbarItem>
-          <Button as={Link} color="primary" href="#" variant="flat">
+          <Button as={Link} radius="full" color="primary" href="#" variant="flat">
             Sign Up
           </Button>
         </NavbarItem>

@@ -35,7 +35,7 @@ class BibliographClient {
 
   getApiClient(config) {
     const initialConfig = {
-      baseURL: `http://localhost:5000/api/v1`,
+      baseURL: 'http://localhost:5000/api/v1/',
     };
     const client = axios.create(initialConfig);
     client.interceptors.request.use(localStorageTokenInterceptor);
@@ -49,7 +49,7 @@ class BibliographClient {
       password,
     };
 
-    return this.apiClient.post('register', loginData).then(
+    return this.apiClient.post('register/', loginData).then(
       (resp) => resp.data,
     );
   }

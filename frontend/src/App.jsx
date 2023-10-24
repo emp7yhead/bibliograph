@@ -7,7 +7,9 @@ function App() {
   return (
     <>
       <Navbar />
-      <Registration />
+      <div className="flex justify-center items-center h-screen">
+        <Registration />
+      </div>
     </>
   );
 }

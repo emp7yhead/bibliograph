@@ -4,7 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.sentences.models import Sentence
 
 
-async def add_sentence(session: AsyncSession, book_id: int, sentence: list):
+async def add_sentence(
+    session: AsyncSession,
+    book_id: int,
+    sentence: list
+) -> Sentence:
     return await session.execute(
             insert(Sentence)
             .values(

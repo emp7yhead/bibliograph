@@ -65,4 +65,5 @@ python_version = "3.11"
 check_untyped_defs = true
 ignore_errors = false
 ignore_missing_imports = true
+disallow_incomplete_defs = true
 follow_imports = "skip"

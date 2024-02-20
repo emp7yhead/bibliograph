@@ -120,7 +120,7 @@ async def delete_bookshelf(
     ],
     current_user: Annotated[UserOut, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
-):
+) -> HTTPStatus:
     """Removes bookshelf from user."""
     bookshelf: Bookshelf | None = await get_bookshelf(session, bookshelf_id)
     if not bookshelf:

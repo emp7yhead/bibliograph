@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.schemas import TokenData
 from app.database import get_session
 from app.settings import settings
+from app.users.models import User
 from app.users.service import get_user_by_username
 
 
@@ -84,7 +85,7 @@ def create_access_token(
 async def get_current_user(
     db_session: AsyncSession = Depends(get_session),
     token: str = Depends(security)
-):
+) -> User:
     """
     Get current user.
 

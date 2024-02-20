@@ -40,7 +40,7 @@ def get_password_hash(password: str) -> str:
 async def validate_user(
     session: AsyncSession,
     user: OAuth2PasswordRequestForm = Depends()
-):
+) -> User:
     """
     Verify that user exists and entered correct password.
 

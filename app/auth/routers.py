@@ -1,7 +1,7 @@
 from datetime import timedelta
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -45,7 +45,7 @@ async def create_user(
 async def login(
     user: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_session)
-):
+) -> Response:
     """Login as user. Verify user and gives access token."""
     user = await validate_user(session, user)
 

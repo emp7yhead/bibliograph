@@ -81,7 +81,7 @@ async def create_book(
     book: BookIn,
     current_user: Annotated[UserOut, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
-):
+) -> Book:
     """Creates book and add it to bookshelf."""
     bookshelf: Bookshelf | None = await get_bookshelf(
         session, book.bookshelf_id
@@ -138,7 +138,7 @@ async def delete_book(
     ],
     current_user: Annotated[UserOut, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
-):
+) -> HTTPStatus:
     """Removes book from db."""
     book: Book | None = await get_book_by_id(session, book_id)
     if not book:

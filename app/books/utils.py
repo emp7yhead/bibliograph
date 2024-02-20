@@ -6,7 +6,7 @@ from fastapi import HTTPException
 from app.books.schemas import BookForDb
 
 
-def normalize(book_title: str):
+def normalize(book_title: str) -> str:
     """Normalize title of book for request.
 
     Args:

@@ -63,7 +63,7 @@ async def get_book(
         Path(..., description="Id of book to get", gt=0)
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
-) -> Book | None:
+) -> Book:
     """Get book info by book id."""
     book: Book | None = await get_book_by_id(session, book_id)
     if not book:

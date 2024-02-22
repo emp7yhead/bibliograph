@@ -98,7 +98,7 @@ async def delete_user(
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
     current_user: Annotated[UserOut, Depends(get_current_user)],
-) -> HTTPStatus:
+):
     """Remove user from database by specified id."""
     db_user: User | None = await get_user(session, user_id)
     if not db_user:

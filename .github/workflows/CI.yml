@@ -50,7 +50,7 @@ jobs:
       #   run: pip install rye
 
       - name: Install dependencies
-        run: pip install --no-cache-dir -r requirements.lock
+        run: pip install --no-cache-dir -r requirements-dev.lock
 
       - name: Apply migrations
         run: alembic upgrade head

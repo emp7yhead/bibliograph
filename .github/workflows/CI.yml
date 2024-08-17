@@ -45,23 +45,24 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Setup Poetry
-        run: pip install rye
+      # FIX: rye in ci
+      # - name: Setup Rye
+      #   run: pip install rye
 
       - name: Install dependencies
-        run: make install
+        run: pip install --no-cache-dir -r requirements.lock
 
       - name: Apply migrations
-        run: make migrate
+        run: alembic upgrade head
 
       - name: Run check
-        run: make check
+        run: ruff check
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: ./coverage.xml
-          fail_ci_if_error: true
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     file: ./coverage.xml
+      #     fail_ci_if_error: true
 
   build:
     needs: test_and_lint

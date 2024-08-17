@@ -1,31 +1,31 @@
 .DEFAULT_GOAL = help
 
 install:  ## Install dependencies
-	poetry install
+	rye sync
 
 serve:  ## Run server locally
-	poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 5000
+	rye run uvicorn app.main:app --reload --host 0.0.0.0 --port 5000
 
 migration:  ## Make migration
-	poetry run alembic revision --autogenerate -m "$(ARGS)"
+	rye run alembic revision --autogenerate -m "$(ARGS)"
 
 migrate:  ## Apply migrations
-	poetry run alembic upgrade head
+	rye run alembic upgrade head
 
 lint:  ## Check lint
-	poetry run flake8 app
+	rye run lint
 
 test:  ## Check tests
-	poetry run python -m pytest
+	rye test
 
 coverage:  ## Check test coverage
-	poetry run python -m pytest --cov=app
+	rye run python -m pytest --cov=app
 
 coverage-report:  ## Make test coverage report
-	poetry run python -m pytest --cov=app --cov-report xml
+	rye run python -m pytest --cov=app --cov-report xml
 
 type:  ## Run type check
-	poetry run mypy app
+	rye run mypy app
 
 run: .env  ## Run app in docker compose
 	docker-compose up

@@ -11,8 +11,12 @@ from app.database import Base
 DATABASE_URL = "postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/test"
 
 
-engine = create_async_engine(DATABASE_URL, future=True, echo=True, poolclass=NullPool)
-async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
+engine = create_async_engine(
+    DATABASE_URL, future=True, echo=True, poolclass=NullPool
+)
+async_session = sessionmaker(
+    engine, expire_on_commit=False, class_=AsyncSession
+)
 
 
 @app.on_event('startup')

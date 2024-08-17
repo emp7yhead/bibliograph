@@ -1,18 +1,15 @@
 import datetime
-from time import timezone
 
-from sqlalchemy import CheckConstraint, DateTime, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
+from sqlalchemy import CheckConstraint, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
 
-from app.bookshelf.models import Bookshelf
 from app.database import Base
 
 
 class ReadingSegment(Base):
     __tablename__ = 'reading_segments'
     __table_args__ = (
-       CheckConstraint('started_at<finished_at')
+        CheckConstraint('started_at<finished_at')
     )
 
     id: Mapped[int] = mapped_column(
@@ -28,4 +25,4 @@ class ReadingSegment(Base):
     user_id: Mapped[int] = mapped_column('user.id')
 
     def __repr__(self):
-        return f"<Segment({self.started_at} {self.finished_at} {self.readed_pages})>"
+        return f"<Segment({self.started_at} {self.finished_at} {self.readed_pages})>"  # noqa: E501

@@ -8,13 +8,10 @@ RUN apk add --no-cache gcc \
     libffi-dev \
     openssl-dev
 
-RUN pip install --no-cache-dir poetry
+ADD requirements.lock ./
 
-COPY pyproject.toml poetry.lock ./
+RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
-RUN poetry config virtualenvs.create false && \
-    poetry install --only main --no-interaction --no-ansi --no-root
+ADD . .
 
-COPY . .
-
-CMD ["make", "serve"]
+CMD ["uvicorn", "main:app", "--reload", "--host 0.0.0.0", "--port 5000"]

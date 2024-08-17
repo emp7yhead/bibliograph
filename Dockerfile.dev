@@ -1,6 +1,6 @@
-FROM python:3.11-alpine AS builder
+FROM python:3.11-alpine
 
-WORKDIR /code
+WORKDIR /app
 
 RUN apk add --no-cache gcc \
     musl-dev \
@@ -8,19 +8,9 @@ RUN apk add --no-cache gcc \
     libffi-dev \
     openssl-dev
 
-ADD pyproject.toml poetry.lock /code/
+COPY requirements.lock ./
 
-RUN pip install poetry
-
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
-
-FROM python:3.11-alpine
-
-WORKDIR /app
-
-COPY --from=builder /code/requirements.txt /app/requirements.txt
-
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
+RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
 RUN adduser -D user && chown -R user:user ./
 

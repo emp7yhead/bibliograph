@@ -1,31 +1,8 @@
 .DEFAULT_GOAL = help
 
-install:  ## Install dependencies
-	rye sync
-
-serve:  ## Run server locally
-	rye run uvicorn app.main:app --reload --host 0.0.0.0 --port 5000
 
 migration:  ## Make migration
 	rye run alembic revision --autogenerate -m "$(ARGS)"
-
-migrate:  ## Apply migrations
-	rye run alembic upgrade head
-
-lint:  ## Check lint
-	rye run lint
-
-test:  ## Check tests
-	rye test
-
-coverage:  ## Check test coverage
-	rye run python -m pytest --cov=app
-
-coverage-report:  ## Make test coverage report
-	rye run python -m pytest --cov=app --cov-report xml
-
-type:  ## Run type check
-	rye run mypy app
 
 run: .env  ## Run app in docker compose
 	docker-compose up

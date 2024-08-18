@@ -44,6 +44,12 @@ dev-dependencies = [
 
 [tool.rye.scripts]
 lint = "ruff check"
+migrate = "alembic upgrade head"
+coverage = "pytest --cov=app"
+coverage-report = "pytest --cov=app --cov-report xml"
+type = "mypy app"
+serve = "uvicorn app.main:app --reload --host 0.0.0.0 --port 5000"
+check = { chain = ["lint", "type" ] }
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -68,13 +74,6 @@ follow_imports = "skip"
 line-length = 80
 indent-width = 4
 target-version = "py311"
-lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-lint.fixable = ["ALL"]
-lint.unfixable = []
-lint.select = [
-    "E",  # pycodestyle
-    "F",  # pyflakes
-]
 exclude = [
     ".bzr",
     ".direnv",
@@ -104,6 +103,15 @@ exclude = [
     "venv",
     "alembic/",
     "tests/"
+]
+
+[tool.ruff.lint]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+fixable = ["ALL"]
+unfixable = []
+select = [
+    "E",  # pycodestyle
+    "F",  # pyflakes
 ]
 
 [tool.ruff.format]

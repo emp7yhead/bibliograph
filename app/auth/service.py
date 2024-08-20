@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.users.models import User
 from app.users.service import get_user_by_username
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -39,7 +39,7 @@ def get_password_hash(password: str) -> str:
 
 async def validate_user(
     session: AsyncSession,
-    user: OAuth2PasswordRequestForm = Depends()
+    user: OAuth2PasswordRequestForm = Depends(),
 ) -> User:
     """
     Verify that user exists and entered correct password.
@@ -55,7 +55,7 @@ async def validate_user(
     if not db_user or not verify_password(user.password, db_user.password):
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail='Incorrect username or password',
         )
 
     return db_user

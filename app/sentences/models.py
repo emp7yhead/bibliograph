@@ -9,10 +9,10 @@ class Sentence(Base):
     __tablename__ = 'sentences'
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, index=True
+        primary_key=True, autoincrement=True, index=True,
     )
     book_id: Mapped[int] = mapped_column(
-        ForeignKey('books.id', ondelete='CASCADE')
+        ForeignKey('books.id', ondelete='CASCADE'),
     )
     books: Mapped['Book'] = relationship(
         back_populates='first_sentence',

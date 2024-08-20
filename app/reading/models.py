@@ -13,7 +13,7 @@ class ReadingSegment(Base):
     )
 
     id: Mapped[int] = mapped_column(
-        primary_key=True, autoincrement=True, index=True
+        primary_key=True, autoincrement=True, index=True,
     )
     started_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
@@ -25,4 +25,4 @@ class ReadingSegment(Base):
     user_id: Mapped[int] = mapped_column('user.id')
 
     def __repr__(self):
-        return f"<Segment({self.started_at} {self.finished_at} {self.readed_pages})>"  # noqa: E501
+        return f'<Segment({self.started_at} {self.finished_at} {self.readed_pages})>'  # noqa: E501

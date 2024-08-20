@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel
@@ -26,24 +26,24 @@ class OAuth2PasswordBearerCookie(OAuth2):
         if not scopes:
             scopes = {}
         flows = OAuthFlowsModel(password={
-                "tokenUrl": token_url,
-                "scopes": scopes
+                'tokenUrl': token_url,
+                'scopes': scopes,
             },
         )
         super().__init__(
-            flows=flows, scheme_name=scheme_name, auto_error=auto_error
+            flows=flows, scheme_name=scheme_name, auto_error=auto_error,
         )
 
-    async def __call__(self, request: Request) -> Optional[str]:
-        authorization: str | None = request.cookies.get("Authorization")
+    async def __call__(self, request: Request) -> str | None:
+        authorization: str | None = request.cookies.get('Authorization')
         scheme, param = get_authorization_scheme_param(authorization)
 
-        if not authorization or scheme.lower() != "bearer":
+        if not authorization or scheme.lower() != 'bearer':
             if self.auto_error:
                 raise HTTPException(
                     status_code=401,
-                    detail="Not authenticated",
-                    headers={"WWW-Authenticate": "Bearer"},
+                    detail='Not authenticated',
+                    headers={'WWW-Authenticate': 'Bearer'},
                 )
             else:
                 return None
@@ -51,12 +51,12 @@ class OAuth2PasswordBearerCookie(OAuth2):
         return param
 
 
-security = OAuth2PasswordBearerCookie(token_url="/login")  # noqa: S106
+security = OAuth2PasswordBearerCookie(token_url='/login')  # noqa: S106
 
 
 def create_access_token(
     data: dict,
-    expires_delta: Optional[timedelta] = None
+    expires_delta: timedelta | None = None,
 ) -> str:
     """
     Creates access token for user.
@@ -74,9 +74,9 @@ def create_access_token(
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
 
-    to_encode.update({"exp": expire})
+    to_encode.update({'exp': expire})
     encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM,
     )
 
     return encoded_jwt
@@ -84,7 +84,7 @@ def create_access_token(
 
 async def get_current_user(
     db_session: AsyncSession = Depends(get_session),
-    token: str = Depends(security)
+    token: str = Depends(security),
 ) -> User:
     """
     Get current user.
@@ -97,15 +97,15 @@ async def get_current_user(
     """
     credentials_exception = HTTPException(
         status_code=401,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+        detail='Could not validate credentials',
+        headers={'WWW-Authenticate': 'Bearer'},
     )
 
     try:
         payload: dict[str, Any] = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM],
         )
-        username: str | None = payload.get("sub")
+        username: str | None = payload.get('sub')
         if username is None:
             raise credentials_exception
         token_data: TokenData = TokenData(username=username)

@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     @validator('SQLALCHEMY_DATABASE_URI', pre=True)
     def assemble_db_connection(
-        self, v: str | None,
+        cls, v: str | None,  # noqa: N805
         values: dict[str, Any],
     ) -> str:
         if isinstance(v, str):

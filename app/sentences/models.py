@@ -1,8 +1,12 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.books.models import Book
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.books.models import Book
 
 
 class Sentence(Base):

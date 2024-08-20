@@ -28,5 +28,5 @@ class User(Base):
         lazy='selectin',
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<User({self.username} {self.id} {self.email})>'

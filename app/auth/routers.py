@@ -1,5 +1,6 @@
 from datetime import timedelta
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.encoders import jsonable_encoder
@@ -11,9 +12,11 @@ from app.auth.jwthandler import create_access_token
 from app.auth.service import validate_user
 from app.dependecies import get_session
 from app.settings import settings
-from app.users.models import User
 from app.users.schemas import UserIn, UserOut
 from app.users.service import add_user, get_user_by_username
+
+if TYPE_CHECKING:
+    from app.users.models import User
 
 auth_router = APIRouter(tags=['Auth'])
 
@@ -71,7 +74,7 @@ async def login(
         httponly=True,
         max_age=1800,
         expires=1800,
-        samesite='Lax',
+        samesite='lax',
         secure=False,
     )
 

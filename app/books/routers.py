@@ -115,7 +115,7 @@ async def update_book_progress(
     db_book: Book | None = await get_book_by_id(session, book_id)
     if not db_book:
         raise HTTPException(status_code=404, detail='Book not found')
-    bookshelf: Bookshelf = await get_bookshelf(  # type: ignore
+    bookshelf: Bookshelf = await get_bookshelf(
         session, db_book.bookshelf_id,
     )
     if bookshelf.user_id == current_user.id:
@@ -139,12 +139,12 @@ async def delete_book(
     ],
     current_user: Annotated[UserOut, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
-):
+) -> HTTPStatus:
     """Removes book from db."""
     book: Book | None = await get_book_by_id(session, book_id)
     if not book:
         return HTTPStatus.NO_CONTENT
-    bookshelf: Bookshelf = await get_bookshelf(  # type: ignore
+    bookshelf: Bookshelf = await get_bookshelf(
         session, book.bookshelf_id,
     )
     if bookshelf.user_id == current_user.id:

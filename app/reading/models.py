@@ -24,5 +24,5 @@ class ReadingSegment(Base):
     readed_pages: Mapped[int]
     user_id: Mapped[int] = mapped_column('user.id')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'<Segment({self.started_at} {self.finished_at} {self.readed_pages})>'  # noqa: E501

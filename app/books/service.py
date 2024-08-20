@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -105,14 +105,14 @@ async def update_book(
 
     Returns: Book | None
     """
-    book: Book = await get_book_by_id(session, book_id)  # type: ignore
+    book: Book = await get_book_by_id(session, book_id)
     if not book_progress.readed_pages:
         updated_book = await session.execute(
             update(Book)
             .where(Book.id == book_id)
             .values(
                 status=ReadStatus.IN_PROGRESS,
-                started_at=datetime.now(),
+                started_at=datetime.now(UTC),
             )
             .returning(Book),
         )
@@ -122,12 +122,12 @@ async def update_book(
             .where(Book.id == book_id)
             .values(
                 status=ReadStatus.FINISHED,
-                finished_at=datetime.now(),
+                finished_at=datetime.now(UTC),
                 readed_pages=book_progress.readed_pages,
             )
             .returning(Book),
         )
-    elif book.progress == ReadStatus.IN_PROGRESS:
+    elif book.status == ReadStatus.IN_PROGRESS:
         updated_book = await session.execute(
             update(Book)
             .where(Book.id == book_id)
@@ -140,7 +140,7 @@ async def update_book(
             .where(Book.id == book_id)
             .values(
                 status=ReadStatus.IN_PROGRESS,
-                started_at=datetime.now(),
+                started_at=datetime.now(UTC),
                 readed_pages=book_progress.readed_pages,
             )
             .returning(Book),

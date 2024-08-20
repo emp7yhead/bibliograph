@@ -6,6 +6,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
+AVERAGE_PAGES_PER_HOUR = 50
+
 
 class ReadStatus(enum.Enum):
     ADDED = 'added'
@@ -49,15 +51,15 @@ class Book(Base):
     )
 
     @property
-    def reading_progress(self):
+    def reading_progress(self) -> str:
         """Calculate reading progress."""
         percentage = round(self.readed_pages / (self.total_pages / 100), 2)
         return f'{percentage}%'
 
     @property
-    def time_to_read(self):
+    def time_to_read(self) -> str:
         """Calculate total time to read book."""
-        AVERAGE_PAGES_PER_HOUR = 50
+
         raw_time = round(self.total_pages / AVERAGE_PAGES_PER_HOUR, 2)
         hours: int = int(raw_time // 1)
         minutes: float = int(raw_time % 1 * 60)

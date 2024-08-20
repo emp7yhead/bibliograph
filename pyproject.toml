@@ -112,7 +112,10 @@ unfixable = []
 select = [
     "ALL"
 ]
-ignore = ["D"]
+ignore = [
+    "D",
+    "B008",  # we love dependencies
+]
 
 [tool.ruff.format]
 quote-style = "single"

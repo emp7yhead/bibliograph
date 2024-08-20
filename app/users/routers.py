@@ -81,7 +81,10 @@ async def update_user(
         try:
             updated_user: User = await renew_user(session, user, user_id)
         except IntegrityError:
-            raise HTTPException(status_code=409, detail='Username alredy taken')
+            raise HTTPException(
+                status_code=409,
+                detail='Username alredy taken',
+            ) from None
         return updated_user
     raise HTTPException(status_code=403, detail='Not authorized to update')
 
@@ -99,7 +102,7 @@ async def delete_user(
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
     current_user: Annotated[UserOut, Depends(get_current_user)],
-):
+) -> HTTPStatus:
     """Remove user from database by specified id."""
     db_user: User | None = await get_user(session, user_id)
     if not db_user:

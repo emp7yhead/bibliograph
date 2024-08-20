@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwthandler import create_access_token
 from app.auth.service import validate_user
-from app.database import get_session
+from app.dependecies import get_session
 from app.settings import settings
 from app.users.models import User
 from app.users.schemas import UserIn, UserOut

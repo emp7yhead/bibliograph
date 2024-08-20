@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import TokenData
-from app.database import get_session
+from app.dependecies import get_session
 from app.settings import settings
 from app.users.models import User
 from app.users.service import get_user_by_username

@@ -1,12 +1,13 @@
+from collections.abc import Sequence
 from http import HTTPStatus
-from typing import Annotated, Sequence
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwthandler import get_current_user
-from app.database import get_session
+from app.dependecies import get_session
 from app.users.models import User
 from app.users.schemas import UserIn, UserOut, UserOutDb
 from app.users.service import get_all_users, get_user, remove_user, renew_user
@@ -24,11 +25,11 @@ async def read_users(
     session: Annotated[AsyncSession, Depends(get_session)],
     limit: Annotated[
         int | None,
-        Query(description="Limit for list of users", ge=0),
+        Query(description='Limit for list of users', ge=0),
     ] = None,
     offset: Annotated[
         int | None,
-        Query(description="Offset for list of users", ge=0)
+        Query(description='Offset for list of users', ge=0),
     ] = None,
 ) -> Sequence[User]:
     """Get all user from database."""
@@ -45,7 +46,7 @@ async def read_users(
 async def read_user(
     user_id: Annotated[
         int,
-        Path(..., description="Id of user to get", gt=0)
+        Path(..., description='Id of user to get', gt=0),
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> User | None:
@@ -66,7 +67,7 @@ async def read_user(
 async def update_user(
     user_id: Annotated[
         int,
-        Path(..., description="Id of user to update", gt=0)
+        Path(..., description='Id of user to update', gt=0),
     ],
     user: UserIn,
     current_user: Annotated[UserOut, Depends(get_current_user)],
@@ -80,9 +81,12 @@ async def update_user(
         try:
             updated_user: User = await renew_user(session, user, user_id)
         except IntegrityError:
-            raise HTTPException(status_code=409, detail='Username alredy taken')
+            raise HTTPException(
+                status_code=409,
+                detail='Username alredy taken',
+            ) from None
         return updated_user
-    raise HTTPException(status_code=403, detail="Not authorized to update")
+    raise HTTPException(status_code=403, detail='Not authorized to update')
 
 
 @user_router.delete(
@@ -94,11 +98,11 @@ async def update_user(
 async def delete_user(
     user_id: Annotated[
         int,
-        Path(..., description="Id of user to delete", gt=0)
+        Path(..., description='Id of user to delete', gt=0),
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
     current_user: Annotated[UserOut, Depends(get_current_user)],
-):
+) -> HTTPStatus:
     """Remove user from database by specified id."""
     db_user: User | None = await get_user(session, user_id)
     if not db_user:
@@ -106,4 +110,4 @@ async def delete_user(
     if user_id == current_user.id:
         await remove_user(session, user_id)
         return HTTPStatus.NO_CONTENT
-    raise HTTPException(status_code=403, detail="Not authorized to delete")
+    raise HTTPException(status_code=403, detail='Not authorized to delete')

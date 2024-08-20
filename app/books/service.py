@@ -1,5 +1,5 @@
-from datetime import datetime
-from typing import Sequence
+from collections.abc import Sequence
+from datetime import UTC, datetime
 
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +11,7 @@ from app.sentences.service import add_sentence
 
 
 async def get_all_books(
-    session: AsyncSession, offset: int | None, limit: int | None
+    session: AsyncSession, offset: int | None, limit: int | None,
 ) -> Sequence[Book]:
     """
     Get all books from database
@@ -26,7 +26,7 @@ async def get_all_books(
     books = await session.execute(
         select(Book)
         .limit(limit)
-        .offset(offset)
+        .offset(offset),
     )
     return books.scalars().all()
 
@@ -48,7 +48,7 @@ async def add_book_info(
     new_book = await add_book(session, book_info, bookshelf_id, author_id)
     if book_info.first_sentence:
         await add_sentence(
-            session, new_book.id, book_info.first_sentence
+            session, new_book.id, book_info.first_sentence,
         )
     await session.flush()
     await session.commit()
@@ -70,7 +70,7 @@ async def add_book(
             total_pages=book_info.total_pages,
             bookshelf_id=bookshelf_id,
         )
-        .returning(Book)
+        .returning(Book),
     )
     return new_book.scalar_one()
 
@@ -87,13 +87,13 @@ async def get_book_by_id(session: AsyncSession, book_id: int) -> Book | None:
     """
     book = await session.execute(
         select(Book)
-        .where(Book.id == book_id)
+        .where(Book.id == book_id),
     )
     return book.scalar_one_or_none()
 
 
 async def update_book(
-    session: AsyncSession, book_id: int, book_progress: BookProgress
+    session: AsyncSession, book_id: int, book_progress: BookProgress,
 ) -> Book:
     """
     Get book by id
@@ -105,16 +105,16 @@ async def update_book(
 
     Returns: Book | None
     """
-    book: Book = await get_book_by_id(session, book_id)  # type: ignore
+    book: Book = await get_book_by_id(session, book_id)
     if not book_progress.readed_pages:
         updated_book = await session.execute(
             update(Book)
             .where(Book.id == book_id)
             .values(
                 status=ReadStatus.IN_PROGRESS,
-                started_at=datetime.now(),
+                started_at=datetime.now(UTC),
             )
-            .returning(Book)
+            .returning(Book),
         )
     elif book.readed_pages == book_progress.readed_pages:
         updated_book = await session.execute(
@@ -122,17 +122,17 @@ async def update_book(
             .where(Book.id == book_id)
             .values(
                 status=ReadStatus.FINISHED,
-                finished_at=datetime.now(),
+                finished_at=datetime.now(UTC),
                 readed_pages=book_progress.readed_pages,
             )
-            .returning(Book)
+            .returning(Book),
         )
-    elif book.progress == ReadStatus.IN_PROGRESS:
+    elif book.status == ReadStatus.IN_PROGRESS:
         updated_book = await session.execute(
             update(Book)
             .where(Book.id == book_id)
             .values(readed_pages=book_progress.readed_pages)
-            .returning(Book)
+            .returning(Book),
         )
     else:
         updated_book = await session.execute(
@@ -140,17 +140,17 @@ async def update_book(
             .where(Book.id == book_id)
             .values(
                 status=ReadStatus.IN_PROGRESS,
-                started_at=datetime.now(),
+                started_at=datetime.now(UTC),
                 readed_pages=book_progress.readed_pages,
             )
-            .returning(Book)
+            .returning(Book),
         )
     await session.commit()
     return updated_book.scalar_one()
 
 
 async def remove_book(
-    session: AsyncSession, book_id: int
+    session: AsyncSession, book_id: int,
 ) -> Book | None:
     """
     Remove book from database
@@ -164,8 +164,8 @@ async def remove_book(
     bookshelf = await session.execute(
         delete(Book)
         .where(Book.id == book_id)
-        .execution_options(synchronize_session="fetch")
-        .returning(Book)
+        .execution_options(synchronize_session='fetch')
+        .returning(Book),
     )
     await session.commit()
     return bookshelf.scalar_one_or_none()

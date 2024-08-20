@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from http import HTTPStatus
-from typing import Annotated, Sequence
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +15,7 @@ from app.bookshelf.service import (
     remove_bookshelf,
     renew_bookshelf,
 )
-from app.database import get_session
+from app.dependecies import get_session
 from app.users.schemas import UserOut
 
 bookshelf_router = APIRouter(prefix='/bookshelf', tags=['Bookshelves'])
@@ -24,15 +25,15 @@ bookshelf_router = APIRouter(prefix='/bookshelf', tags=['Bookshelves'])
     '',
     response_model=list[BookshelfOutDb],
     status_code=HTTPStatus.OK,
-    description='Get user\'s bookshelves by id.',
+    description="Get user's bookshelves by id.",
 )
 async def read_user_bookshelves(
     user_id: Annotated[
         int,
         Query(
             ...,
-            description="Id of user whose bookshelves you want to retrieve.",
-            gt=0
+            description='Id of user whose bookshelves you want to retrieve.',
+            gt=0,
         ),
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -51,13 +52,13 @@ async def read_user_bookshelves(
 async def read_bookshelf(
     bookshelf_id: Annotated[
         int,
-        Path(..., description="Id of bookshelf to get", gt=0)
+        Path(..., description='Id of bookshelf to get', gt=0),
     ],
     session: Annotated[AsyncSession, Depends(get_session)],
 ) -> Bookshelf | None:
     bookshelf: Bookshelf | None = await get_bookshelf(session, bookshelf_id)
     if not bookshelf:
-        raise HTTPException(status_code=404, detail="Bookshelf not found")
+        raise HTTPException(status_code=404, detail='Bookshelf not found')
     return bookshelf
 
 
@@ -74,7 +75,7 @@ async def create_bookshelf(
 ) -> Bookshelf:
     """Create new bookshelf for user."""
     new_bookshelf: Bookshelf = await add_bookshelf(
-        session, bookshelf, current_user.id
+        session, bookshelf, current_user.id,
     )
     return new_bookshelf
 
@@ -89,7 +90,7 @@ async def create_bookshelf(
 async def update_bookshelf(
     bookshelf_id: Annotated[
         int,
-        Path(..., description="Id of bookshelf to update", gt=0)
+        Path(..., description='Id of bookshelf to update', gt=0),
     ],
     bookshelf: BookshelfIn,
     current_user: Annotated[UserOut, Depends(get_current_user)],
@@ -101,10 +102,10 @@ async def update_bookshelf(
         raise HTTPException(status_code=404, detail='Booskhelf not found')
     if db_bookshelf.user_id == current_user.id:
         updated_bookshelf: Bookshelf = await renew_bookshelf(
-            session, bookshelf, bookshelf_id
+            session, bookshelf, bookshelf_id,
         )
         return updated_bookshelf
-    raise HTTPException(status_code=403, detail="Not authorized to update")
+    raise HTTPException(status_code=403, detail='Not authorized to update')
 
 
 @bookshelf_router.delete(
@@ -116,11 +117,11 @@ async def update_bookshelf(
 async def delete_bookshelf(
     bookshelf_id: Annotated[
         int,
-        Path(..., description="Delete bookshelf data by id", gt=0)
+        Path(..., description='Delete bookshelf data by id', gt=0),
     ],
     current_user: Annotated[UserOut, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
-):
+) -> HTTPStatus:
     """Removes bookshelf from user."""
     bookshelf: Bookshelf | None = await get_bookshelf(session, bookshelf_id)
     if not bookshelf:
@@ -128,4 +129,4 @@ async def delete_bookshelf(
     if bookshelf.user_id == current_user.id:
         await remove_bookshelf(session, bookshelf_id)
         return HTTPStatus.NO_CONTENT
-    raise HTTPException(status_code=403, detail="Not authorized to delete")
+    raise HTTPException(status_code=403, detail='Not authorized to delete')

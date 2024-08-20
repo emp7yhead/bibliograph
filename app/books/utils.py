@@ -31,8 +31,11 @@ async def get_raw_info(book_title: str) -> dict[str, Any]:
         'fields': 'number_of_pages_median,author_name,first_sentence,title',
         'limit': 1,
     }
-    async with aiohttp.ClientSession('https://openlibrary.org') as session:
-        async with session.get('/search.json', params=params) as response:
+    async with aiohttp.ClientSession(
+        'https://openlibrary.org',
+    ) as session, session.get(
+        '/search.json', params=params,
+    ) as response:
             raw_info = await response.json()
     if not raw_info['docs']:
         raise HTTPException(404, 'Book not found')

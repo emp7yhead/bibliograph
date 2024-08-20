@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import Depends, HTTPException, Request
@@ -21,8 +21,9 @@ class OAuth2PasswordBearerCookie(OAuth2):
         token_url: str,
         scheme_name: str | None = None,
         scopes: dict | None = None,
-        auto_error: bool = True,
-    ):
+        *,
+        auto_error: bool =True,
+    ) -> None:
         if not scopes:
             scopes = {}
         flows = OAuthFlowsModel(password={
@@ -45,8 +46,7 @@ class OAuth2PasswordBearerCookie(OAuth2):
                     detail='Not authenticated',
                     headers={'WWW-Authenticate': 'Bearer'},
                 )
-            else:
-                return None
+            return None
 
         return param
 
@@ -70,16 +70,14 @@ def create_access_token(
     to_encode = data.copy()
 
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.now(UTC) + timedelta(minutes=15)
 
     to_encode.update({'exp': expire})
-    encoded_jwt = jwt.encode(
+    return jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM,
     )
-
-    return encoded_jwt
 
 
 async def get_current_user(
@@ -105,15 +103,17 @@ async def get_current_user(
         payload: dict[str, Any] = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM],
         )
-        username: str | None = payload.get('sub')
-        if username is None:
-            raise credentials_exception
-        token_data: TokenData = TokenData(username=username)
     except JWTError:
+        raise credentials_exception from None
+
+    username: str | None = payload.get('sub')
+    if username is None:
         raise credentials_exception
 
+    token_data: TokenData = TokenData(username=username)
+
     user = await get_user_by_username(
-        db_session, token_data.username,  # type: ignore
+        db_session, token_data.username,
     )
     if not user:
         raise credentials_exception

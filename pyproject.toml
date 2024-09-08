@@ -40,6 +40,8 @@ dev-dependencies = [
     "httpx~=0.24.1",
     "aiosqlite~=0.19.0",
     "ruff>=0.6.1",
+    "pytest-postgresql>=6.1.1",
+    "faker>=28.4.1",
 ]
 
 [tool.rye.scripts]

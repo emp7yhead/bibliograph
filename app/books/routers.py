@@ -24,7 +24,7 @@ from app.books.service import (
 from app.books.utils import get_book_info
 from app.bookshelf.models import Bookshelf
 from app.bookshelf.service import get_bookshelf
-from app.dependecies import get_session
+from app.dependencies import get_session
 from app.users.schemas import UserOut
 
 books_router = APIRouter(prefix='/books', tags=['Books'])

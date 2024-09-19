@@ -15,7 +15,7 @@ from app.bookshelf.service import (
     remove_bookshelf,
     renew_bookshelf,
 )
-from app.dependecies import get_session
+from app.dependencies import get_session
 from app.users.schemas import UserOut
 
 bookshelf_router = APIRouter(prefix='/bookshelf', tags=['Bookshelves'])
